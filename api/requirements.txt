@@ -1,0 +1,4 @@
+Flask==0.9
+redis==2.7.2
+redis-wrap==1.3
+

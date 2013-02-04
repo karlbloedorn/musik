@@ -1,0 +1,6 @@
+api/*.pyc
+api/*~
+api/bin
+api/lib
+api/lib64
+api/include

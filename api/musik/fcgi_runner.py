@@ -1,4 +1,4 @@
-#!/var/www/a9g4c/musik/backend/bin/python
+#!/var/www/html/musik/api/bin/python
 from flup.server.fcgi import WSGIServer
 from musik.application import app
 app.use_x_sendfile = True

@@ -25,7 +25,8 @@ class JSONEncoder(json.JSONEncoder):
         pass
     def __encode_album(self, album):
         encoded = album.items()
-        encoded.extend([('_key', album.key), 
+        encoded.extend([('_key', album.key),
+                        ('art', album.art_url),
                         ('songs', album.songs.values())])
         return dict(encoded)
     def __encode_artist(self, artist):
@@ -113,6 +114,20 @@ class Album(APIObject):
         for prop_key, prop_value in props.items():
             self[prop_key] = prop_value
             pass
+        pass
+
+    @property
+    def art_url(self):
+        if 'art' in self and self['art']  == 'local':
+            return '/album/{0}/art'.format(self.key)
+            pass
+        pass
+
+    @property
+    def art(self):
+        if 'art' in self and self['art'] == 'local':
+            store = FileStore(base='/tmp')
+            return store[self.name + ':art']
         pass
     pass
 
@@ -299,7 +314,7 @@ class Library(object):
             pass
         else:
             raise SongExists_Exception(name=song['name'], song=stored_song)
-        return stored_song
+        return stored_song, stored_album, stored_artist
     pass
 
 __all__ = [ 'Library', 'JSONEncoder', 'Song', 'Album', 'Artist', 'SongExists_Exception' ]

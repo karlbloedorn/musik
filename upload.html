@@ -1,0 +1,247 @@
+
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <title>Musik</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="">
+    <meta name="author" content="">
+
+    <link href="css/bootstrap.css" rel="stylesheet">
+    <style>
+      td{
+          -webkit-user-select: none;
+         user-select: none;
+         -moz-user-select: none;
+         white-space: nowrap;
+      }
+      body {
+        padding-top: 40px;
+      }
+      #drop_area{
+         border-radius: 15px;
+         padding-top: 20px;
+         padding-bottom: 20px;
+         width: 250px;
+         border: 1px dashed #BBB;
+         text-align: center;
+         margin-bottom: 10px;
+      }
+    </style>
+    <link href="css/bootstrap-responsive.css" rel="stylesheet">
+  </head>
+  <body>
+      <br>
+      <div class="container">
+          <a onclick="" href="index.html"  class="btn">Done</a>
+
+          <br><br>
+          <div id="drop_area">
+              <span class="label">MP3</span>
+              <span class="label">OGG</span>
+              <span class="label">FLAC</span>
+              <span class="label">M4A</span>
+              <br><br>
+              <h6 id="processing_label">Drag songs here</h6>
+          </div>
+
+          <table id="song_table" class="hide table table-condensed">
+              <thead>
+                  <tr>
+                      <th>Artist</th>
+                      <th>Title</th>
+                      <th>Album</th>
+                      <th>Track</th>
+                      <th>Year</th>
+                      <th>Genre</th>
+                      <th width="60"><i class='icon-flag'></i></th>
+                  </tr>
+              </thead>
+                  
+                  <tbody id="tagging">
+                  </tbody>
+                  
+                   <tbody id="failed">
+                   </tbody>
+              
+                  <tbody id="waiting">
+                  </tbody>
+                  
+                  <tbody id="uploading">
+                  </tbody>
+                  
+                  <tbody id="uploaded">
+                  </tbody>
+          </table>
+    </div>
+    <script src="js/jquery.js"></script>
+    <script src="js/bootstrap.js"></script>
+    <script src="js/id3.min.js"></script>
+    <script src="js/queue.min.js"></script>
+
+    <script>
+        function upload_songs() {
+            window.uploading = 1;
+            if (window.upload_queue.isEmpty()) {
+                window.uploading = 0;
+                return;
+            } else {
+                var obj = window.upload_queue.dequeue();
+                $(obj.row).remove();
+                var progress_bar_outer = $(document.createElement('div')).html("").addClass("progress").css('height', '10px').css('margin', '0px').css('margin-top', '3px');
+                var progress_bar_inner = $(document.createElement('div')).html("").addClass("bar").css('width', '0%').css('height', '10px');
+                $(progress_bar_outer).html("").append(progress_bar_inner);
+                $(obj.status).html("").append(progress_bar_outer);
+                $("#uploading").prepend(obj.row);
+                var oMyForm = new FormData();
+                oMyForm.append("song_file", obj.song);
+
+
+                oMyForm.append("metadata", JSON.stringify( {
+                    artist: {
+                        'name': $(obj.cells.artist).val()
+                    },
+                   album: {
+                       'name': $(obj.cells.album).val()
+                   },
+                   song: {
+                       'name': $(obj.cells.title).val(),
+                       'track': $(obj.cells.track).val()
+                   },
+                }));
+               
+
+                var oReq = new XMLHttpRequest();
+                oReq.open("POST", 'http://bloedorn.us/musik/api/songs');
+
+                oReq.upload.onprogress = function updateProgress(evt) {
+                    if (evt.lengthComputable) {
+                        var percentComplete = (evt.loaded / evt.total) * 100;
+                        $(progress_bar_inner).css("width", "" + percentComplete + "%");
+                    }
+                }
+                oReq.onload = function (oEvent) {
+                    if (oReq.status == 201) {
+                        $(obj.row).remove();
+                        $(obj.status).html("<h6>Uploaded</h6>");
+                        $("#uploaded").prepend(obj.row);
+                        upload_songs();
+                    } else {
+                        $(obj.row).remove();
+                        $(obj.status).html("<h6>Failed</h6>");
+                        $("#failed").prepend(obj.row);
+                        upload_songs();
+                    }
+                };
+                oReq.send(oMyForm);
+            }
+        }
+        function process_songs() {
+            window.processing = 1;
+            if (window.process_queue.isEmpty()) {
+                $("#processing_label").html("Drag songs here");
+                window.processing = 0;
+                return;
+            }
+            processing_count = window.process_queue.getLength();
+            $("#processing_label").html("Processing " + processing_count + " Song" + (processing_count > 1 ? "s" : ""));
+            var file = window.process_queue.dequeue();
+            var url = file.urn || file.name;
+            var reader = FileAPIReader(file);
+            function process_tags() {
+                var tags = ID3.getAllTags(url);
+                $("#song_table").removeClass("hide");    // only needs to be called once.
+                var song_row = $(document.createElement('tr'));
+                var fields = { 'artist': "", 'title': "", 'album': "", 'track': "", 'year': "", 'genre': "" };
+                for (var field in fields) {
+                    var val = tags[field];
+
+                    if (field == 'track') {
+                        var re = /(\d+)\/(\d+)/;
+                        var val = ("" + val).replace(re, "$1");
+                        var val = parseInt(val);
+                    }
+                    var parentCell = document.createElement('td');
+
+                    var cell = $(document.createElement('input')).attr('type', 'text');
+                    if (field == 'track' || field == 'year' || field == 'genre') {
+                        $(cell).addClass("input-mini");
+                    }
+                    cell.val("" + (val || ""));
+                    fields[field] = cell;
+
+                    $(parentCell).append(cell);
+                    $(song_row).append(parentCell);
+                }
+                var upload_button = $(document.createElement('a')).html("<i class='icon-ok'></i>").addClass("btn btn-mini");
+                var delete_button = $(document.createElement('a')).html("<i class='icon-remove'></i>").addClass("btn btn-mini");
+                var status_cell = $(document.createElement('td')).html("");
+                var button_grp = $(document.createElement('div')).html("").addClass("btn-group");
+
+
+
+                $(button_grp).append(upload_button).append(delete_button);
+
+                $(status_cell).append(button_grp);
+                $(song_row).append(status_cell);
+                $("#tagging").prepend(song_row);
+
+                $(upload_button).click(function () {
+                    $(song_row).remove();
+                    $(status_cell).html("<h6>Waiting</h6>");
+                    $(song_row).children().attr('contenteditable', 'false');
+                    $("#waiting").prepend(song_row);
+                    var cur_song = { song: file, row: song_row, status: status_cell, cells: fields };
+                    window.upload_queue.enqueue(cur_song);
+                    if (window.uploading != 1) {
+                        upload_songs();
+                    }
+                });
+
+                $(delete_button).click(function () {
+                    // clear out some of the associated data.
+                    $(song_row).remove();
+
+                });
+                process_songs();
+            }
+            ID3.loadTags(url, process_tags, { tags: ["artist", "title", "album", "year", "track", "genre"], dataReader: reader });
+        }
+        jQuery(document).ready(function ($) {
+
+            window.process_queue = new Queue();
+            window.upload_queue = new Queue();
+
+            $("#song_table tbody").on("keypress", "td", function (event) {
+
+                var keycode = (event.keyCode ? event.keyCode : event.which);
+                if (keycode == '13') {
+                    event.preventDefault();
+                }
+            });
+
+            var body = document.body;
+            body.addEventListener("dragover", function (e) {
+                e.preventDefault();
+            }, false);
+
+            body.addEventListener("dragenter", function (e) {
+                e.preventDefault();
+            }, false);
+
+
+            body.addEventListener('drop', function (e) {
+                e.preventDefault();
+                var files = e.dataTransfer.files;
+                for (var i = 0; i < files.length; i++) {
+                    window.process_queue.enqueue(files[i]);
+                }
+                if (window.processing != 1) {
+                    process_songs();
+                }
+            }, false);
+        });
+    </script>
+  </body>
+</html>

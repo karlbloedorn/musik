@@ -3,6 +3,9 @@
 <head>
     <title></title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link href="css/bootstrap.css" rel="stylesheet">
+    <link href="css/bootstrap-responsive.css" rel="stylesheet">
+    <link href='//fonts.googleapis.com/css?family=Bitter:700' rel='stylesheet' type='text/css'>
     <style>
         html {
             background-color: rgb(251, 251, 251);
@@ -13,21 +16,18 @@
             -ms-user-select: none;
             user-select: none;
         }
-
         #song_list {
             padding-top: 10px;
             padding-bottom: 10px;
             overflow-x: hidden;
             overflow-y: auto;
         }
-
         #artist_list {
             padding-top: 10px;
             padding-bottom: 10px;
             overflow-x: hidden;
             overflow-y: auto;
         }
-
         .artist_cell {
             border: 1px solid #fcfcfc;
             padding: 7px;
@@ -36,16 +36,18 @@
             font-family: 'Bitter', serif;
         }
         .artist_cell:hover {
-            cursor: pointer;
-            background-color: #FFF;
-            border: 1px dashed #ddd;
-            border-right: none;
-            color: #000;
-            box-shadow: inset 3px 3px 5px 0px #EEE;
-         }
+                cursor: pointer;
+                background-color: #FFF;
+                border: 1px dashed #ddd;
+                border-right: none;
+                color: #000;
+                -webkit-box-shadow: inset 3px 3px 5px 0px #EEE;
+                box-shadow: inset 3px 3px 5px 0px #EEE;
+        }
         .artist_cell:active {
-            background-color: #FFF;
-            box-shadow: none;
+                background-color: #FFF;
+                -webkit-box-shadow: none;
+                box-shadow: none;
         }
         .artist_art {
             width: 30px;
@@ -54,29 +56,26 @@
         .album_art {
             margin-right: 10px;
             width: 150px;
-            height: 150px;
         }
         .selected_artist {
-            
             background-color: #FFF;
-             border: 1px solid #DDD;
-             border-right: none;
-             color: #000;
-             box-shadow: inset 3px 3px 5px 0px #EEE;
+            border: 1px solid #DDD;
+            border-right: none;
+            color: #000;
+            -webkit-box-shadow: inset 3px 3px 5px 0px #EEE;
+            box-shadow: inset 3px 3px 5px 0px #EEE;
         }
         .album_artist_name {
             font-family: 'Bitter', serif;
             font-size: 1.2em;
             margin-bottom: 10px;
         }
-
         .album_name {
             font-family: arial, sans-serif;
             font-size: 1.4em;
             margin-bottom: 5px;
             font-weight: bold;
         }
-
         .song_track {
             width: 20px;
             float: left;
@@ -103,20 +102,103 @@
         .bottom {
             background-color: #FCFCFC;
             border-top: 1px solid #CCC;
+            -webkit-box-shadow: inset 0px 5px 5px 0px #EEE;
             box-shadow: inset 0px 5px 5px 0px #EEE;
         }
+        .progress .bar-buffer {
+            background-color: rgb(97, 97, 97);
+            background-image: -moz-linear-gradient(top, #333333, #222222);
+            background-image: -webkit-gradient(linear, 0 0, 0 100%, from(#333333), to(#222222));
+            background-image: -webkit-linear-gradient(top, rgb(51, 51, 51), rgb(82, 81, 81));
+            background-image: -o-linear-gradient(top, #333333, #222222);
+            background-image: linear-gradient(to bottom, #333333, #222222);
+            background-repeat: repeat-x;
+            filter: progid:DXImageTransform.Microsoft.gradient(startColorstr='#fffbb450', endColorstr='#ff222222', GradientType=0);
+         }
+        #login{
+				padding: 35px;
+				margin-left: auto;
+				margin-right: auto;
+				margin-top:60px;
+				width: 210px;
+				height: 220px;
+				background-color: #FFF;
+				border-bottom-right-radius: 25px;
+				border-top-left-radius: 25px;
+				color: #111;
+				font-family: Helvetica,Tahoma ;
+				position: relative;
+				font-size: 1.4em;
+				box-shadow: 1px 1px 5px #666;
+			}
+			#id_card{
+				position: absolute;
+				top:25px;
+				right: 30px;
+			}
+			#login_button, #login_loader{
+				position: absolute;
+				bottom:25px;
+				right: 30px;
+			}
+			#login_button{
 
+				cursor: pointer;
+			}
+			#login_form{
+				margin-top: 20px;
+			}
+			#username_field,#password_field{
+				padding: 7px;
+				height: 40px;
+				color: #000;
+				border: 1px solid #222;
+				background-color: #FFF;
+				border-radius: 3px;
+				font-size: 0.9em;
+				margin-top: 15px;
+				width: 202px;
+			}
     </style>
     <meta name="google" value="notranslate" />
-    <link href="css/bootstrap.css" rel="stylesheet">
-    <link href="css/bootstrap-responsive.css" rel="stylesheet">
-    <link href='//fonts.googleapis.com/css?family=Bitter:700' rel='stylesheet' type='text/css'>
+
 </head>
 <body>
+    <div id="login" class="hide">
+			<img id="id_card" src="img/idcard_gray.png">
+			Login<br>
+			<div id="login_form">
+				<input id="username_field" type="text" placeholder="username">
+				<input id="password_field" type="password"  placeholder="password">
+				<img id="login_button" src="img/arrow_gray.png">
+				<img id="login_loader" class="hide" src="img/loader_gray.gif">
+			</div>
+		</div>
     <br />
-    <div class="container-fluid">
+    <div id="topbar" class="hide container-fluid">
         <div class="row-fluid">
-            <div class="span6">
+            <div class="span6" style="height: 100px;">
+                <div class="media" style="padding-bottom: 25px;">
+                    <img class="img-polaroid media-object pull-left" id="playing_albumart" width="70" src="img/album.png"/>
+                    
+                    <div>
+                        <span id="playing_name" class="album_artist_name" style="margin-top: 5px;"> </span>
+                        <span id="playing_artist"  class="song_name" style="margin-top: 5px;"> </span>
+                        
+
+                        <div class="progress"  style="height: 10px; margin-bottom: 3px;">
+                            <div id="playing_progress" class="bar bar-info" style="width: 0%;"></div>
+                            <div id="playing_buffer" class="bar bar-buffer  " style="width: 0%;"></div>
+                        </div>
+                        <div class="pull-left">
+                             <i style="cursor: pointer;" id="playButton" class="icon-play"></i>
+                             <i style="cursor: pointer;" id="pauseButton"  class="icon-pause hide"></i>
+                        </div>
+                        <div class="pull-right">
+                             <h6 id="playing_time" style="margin-top: 0px;"></h6>
+                        </div>
+                    </div>
+                </div>
             </div>
             <div class="span6">
                 <form class="form-search pull-right" id="searchform" action="" method="GET">
@@ -128,52 +210,50 @@
             </div>
         </div>
     </div>
-
-
-    <div class="container-fluid bottom">
+    <div id="library" class="hide container-fluid bottom">
         <div class="row-fluid">
             <div class="span5">
                 <div id="artist_list">
-                    <div class="artist_cell">
+                    <div class="artist_cell" data-bind="css: { selected_artist: $root.selectedArtist == null }">
                         <div id="all_artists_button">
                             <img class="img-polaroid artist_art" style="padding: 1px; margin-right: 5px;">
                             <span>All Artists</span>
                         </div>
                     </div>
                     <div data-bind="foreach: artists">
-                        <div class="artist_cell" data-bind="click: $parent.setSelectedArtist,css: { selected_artist: selected}" >
+                        <div class="artist_cell" data-bind="click: $parent.setSelectedArtist,css: { selected_artist: selected}">
                             <div>
-                                <img class="img-polaroid artist_art" style="padding: 1px; margin-right: 5px;" data-bind="attr:{ src:  $data['art'] == undefined ? 'img/album.png' : art }">
+                                <img class="img-polaroid artist_art" style="padding: 1px; margin-right: 5px;" data-bind="attr:{ src:  $data['art'] == undefined ? 'img/album.png' : '/musik/api/' + art() }">
                                 <span data-bind="text: name" style="vertical-align: middle;"></span>
                             </div>
                         </div>
                     </div>
                 </div>
             </div>
-            <div class="span7">             
+            <div class="span7">
                 <div id="song_list" data-bind="foreach: artists">
                     <div data-bind="visible: albumVisible" style="clear: both;">
                         <div>
                             <div class="album_artist_name" style="margin-top: 5px;" data-bind="text: name"></div>
                         </div>
                         <div data-bind="foreach: albums">
-                           <div data-bind="if:songs().length">
-                            <div class="media" style="padding-bottom: 10px;">
 
-                                <img class="album_art img-polaroid media-object pull-left" data-bind="attr: { src:  $data['art'] == undefined ? 'img/album.png' : art }" />
+                            <div data-bind="if:songs().length">
+                                <div class="media" style="padding-bottom: 10px;">
+                                    <a class="pull_left">
+                                          <img class="album_art img-polaroid media-object pull-left" data-bind="attr: { src: albumArt() }" />
+                                    </a>
                                     <div class="album_name" data-bind="text: name"></div>
-                                    <div>
-                                    
-                                            <div data-bind="foreach: songs">
-                                                <div style="padding-bottom: 3px;" data-bind="click: playSong.bind($data)">
-                                                    <div class="song_track" data-bind="text: track"></div>
-                                                    <div class="song_name" data-bind="text: name"></div>
-                                                </div>
+                                    <div class="media-body">
+                                        <div data-bind="foreach: songs">
+                                            <div style="padding-bottom: 3px;" data-bind="click: playSong.bind($data)">
+                                                <div class="song_track" data-bind="text: track"></div>
+                                                <div class="song_name" data-bind="text: name"></div>
                                             </div>
                                         </div>
                                     </div>
                                 </div>
-                            </div> 
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -188,22 +268,211 @@
 <script src="js/knockout-2.2.1.debug.js"></script>
 <script src="js/codecs.min.js"></script>
 <script src="js/knockout.mapping-latest.debug.js"></script>
+<script src="js/jquery.transit.min.js"></script>
 <script>
+    function adjustedHeight() {
+        var artist_space = $(window).height() - $("#artist_list").offset().top;
+        $("#artist_list").css('max-height', artist_space - 20 + 'px');
+
+        var song_space = $(window).height() - $("#song_list").offset().top;
+        $("#song_list").css('max-height', song_space - 20 + 'px');
+
+    }
+    function hideLogin() {
+        $("#login").addClass("hide");
+        $("#topbar").removeClass("hide");
+        $("#library").removeClass("hide");
+    }
+    function showLogin() {
+        $("#login").removeClass("hide");
+        $("#login_loader").addClass('hide');
+        $("#topbar").addClass("hide");
+        $("#library").addClass("hide");
+
+        $("#username_field").focus();
+        window.BUSY = 0;
+
+        function login_success() {
+            window.BUSY = 0;
+            $("#login").slideUp(200, function () {
+                $("#username_field").val("");
+                $("#password_field").val("");
+                $("#top").removeClass('hide');
+                $("#content").removeClass('hide');
+
+                
+                loadLibrary();
+            });
+        }
+        function login_failure() {
+            $("#password_field").val("");
+
+            $('#login').transition({ rotate: '9deg', duration: 200 })
+                .transition({ rotate: '-9deg', duration: 200 })
+                .transition({ rotate: '0deg', duration: 200 }, function () {
+                    window.BUSY = 0;
+                });
+        }
+        function attempt_login() {
+            if (window.BUSY == 1) {
+                return;
+            }
+            window.BUSY = 1;
+
+            $("#login_loader").removeClass('hide');
+
+            var jqxhr = $.post("api/login", { username: $("#username_field").val() , password: $("#password_field").val() })
+            .done(function () { 
+                login_success();
+            })
+            .fail(function () {
+
+                login_failure();
+            })
+            .always(function () {
+                $("#login_loader").addClass('hide');
+            });          
+        }
+        $("#login_button").click(function () {
+            attempt_login();
+        });
+        $("#username_field").keypress(function (e) {
+            if (e.which == 13 && window.BUSY == 0) {
+                $("#password_field").focus();
+            }
+        });
+        $("#password_field").keypress(function (e) {
+            if (e.which == 13 && window.BUSY == 0) {
+                attempt_login();
+            }
+        });
+    }
+    function secondsToTime(sec) {
+        var durationMins = Math.round(~~(sec / 60));
+        var durationSecs = Math.round(sec % 60);
+        var durationSecsLeading = (durationSecs > 9) ? "" : "0";
+        var durationString = durationMins + ":" +durationSecsLeading + durationSecs;
+        return durationString;
+    }
+
     var player = null;
-    
+
     function playSong(song) {
+
+        $("#playing_time").html("-- / --");
         if (player != null) {
             player.stop();
         }
+        var buffer = 0;
+        var progress = 0;
+       // $("#playing_albumart").css('opacity', '0%');
+
+        
+        var arturl = song.album().art() == 'null' || song.album().art() == null ? "img/album.png" :  '/musik/api/' + song.album().art();
+        $("#playing_albumart").attr('src',arturl );
+
+
+        $("#playing_name").html(song.name());
+        $("#playing_artist").html(song.album().artist().name());
+
         player = new Player.fromURL("/musik/api/" + song.path());
         player.volume = 50;
         player.play();
-    }
-    
+        $("#pauseButton").removeClass("hide");
+        $("#playButton").addClass("hide");
+        player.asset.on('metadata', function () {
 
+            /*
+            var coverString = "img/album.png";
+
+            if (player.metadata.coverArt) {
+                coverString = "data:" + player.metadata.coverArt.mime + ";base64," + window.btoa(String.fromCharCode.apply(null, player.metadata.coverArt.data.data));
+            } else if (player.metadata['Cover Art']){
+                coverString = "data:image/jpg;base64," + window.btoa(String.fromCharCode.apply(null, player.metadata['Cover Art'].data));
+            }
+            $("#playing_albumart").attr('src', coverString);
+            $("#playing_albumart").css('opacity', '100%');
+            */
+
+        });
+        $("#playButton").click(function () {
+            $("#playButton").addClass("hide");
+            $("#pauseButton").removeClass("hide");
+            player.play();
+        });
+        $("#pauseButton").click(function () {
+            $("#pauseButton").addClass("hide");
+            $("#playButton").removeClass("hide");
+            player.pause();
+        });
+
+        function updateProgressBar() {
+            $("#playing_progress").css("width", "" + progress + "%");
+            $("#playing_buffer").css("width", "" + (buffer - progress) + "%");
+        }
+        player.asset.on('buffer', function (percent) {
+            buffer = percent;
+            updateProgressBar();
+        });
+
+
+        player.on('progress', function () {
+            progress = 100 * (player.currentTime / player.duration);
+            $("#playing_time").html("" + secondsToTime(player.currentTime / 1000) + " / " + secondsToTime(player.duration / 1000));
+            updateProgressBar();
+        });
+    }
     var music = null;
-    var ArtistViewModel = function (d, music) {
+
+    var SongViewModel = function (d, album) {
+        var self = this;
+
         ko.mapping.fromJS(d, {}, this);
+        this.album = ko.observable(album);
+
+    }
+
+    var AlbumViewModel = function (d, artist) {
+        var self = this;
+
+        var mapping = {
+            'songs': {
+                create: function (options) {
+                    return new SongViewModel(options.data, self);
+                }
+            }
+        }
+        ko.mapping.fromJS(d, mapping, this);
+
+        this.artist = ko.observable(artist);
+
+        this.albumArt = ko.computed(function () {
+            if (self.art() != null) {
+                return '/musik/api/' + self.art();
+            } else {
+                return 'img/album.png';
+            }
+        }, this);
+    }
+
+    var ArtistViewModel = function (d, music) {
+        var self = this;
+
+        function sortFunction(a, b) {
+            return parseInt(a.track) > parseInt( b.track) ? 1 : -1;
+
+        };
+        var mapping = {
+            'albums': {
+                create: function (options) {
+                    options.data.songs.sort(sortFunction);
+                    return new AlbumViewModel(options.data, self);
+                }
+            }
+        }
+
+        ko.mapping.fromJS(d, mapping, this);
+
         this.selected = ko.computed(function () {
             return music.selectedArtist() == this._key();
         }, this);
@@ -228,29 +497,32 @@
             self.selectedArtist(artist._key());
         }
     }
-    $(document).ready(function () {
-        $("#all_artists_button").click(function () {
-            music.selectedArtist(null);
-        });
-
+    function loadLibrary() {
         $.getJSON('/musik/api/songs', function (data) {
             music = new MusicViewModel(data);
             ko.applyBindings(music);
+            hideLogin();
+            adjustedHeight();
+            $("#topbar").removeClass("hide");
+            $("#library").removeClass("hide");
+        }).error(function () {
+
+            showLogin();
         });
+    }
+    $(document).ready(function () {
+        
+        $("#all_artists_button").click(function () {
+            music.selectedArtist(null);
+        });
+        
 
     
-        function adjustedHeight() {
-            var artist_space = $(window).height() - $("#artist_list").offset().top;
-            $("#artist_list").css('max-height', artist_space - 20 + 'px');
+        loadLibrary();
 
-            var song_space = $(window).height() - $("#song_list").offset().top;
-            $("#song_list").css('max-height', song_space - 20 + 'px');
-
-        }
         $(window).resize(function () {
             adjustedHeight();
         });
-        adjustedHeight();
     });
 </script>
 </html>

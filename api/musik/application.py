@@ -12,6 +12,9 @@ from werkzeug import secure_filename
 from musik.db import *
 from musik.utils import logging_setup
 import musik.sendfile
+import musik.tagging
+import musik.auth
+from flaskext.auth import Auth, AuthUser, login_required, login
 
 def crossdomain(origin=None, methods=None, headers=None,
                 max_age=21600, attach_to_all=True,
@@ -64,17 +67,34 @@ def request_wants_json():
 
 
 app = Flask(__name__)
+auth = Auth(app)
 logger, syshan = logging_setup(__name__)
 lib = Library()
 syshan.setLevel(logging.DEBUG)
 app.logger.addHandler(syshan)
+app.secret_key = 'N4BUdSXUzHxNoO8g'
+
+@app.route('/login', methods = ['POST', 'OPTIONS'])
+@crossdomain(origin='*')
+def logon():
+    username = request.form['username']
+    password = request.form['password']
+    if musik.auth.check_auth(username, password):
+        user = AuthUser(username)
+        login(user)
+        return '', 200
+        pass
+    else:
+        return 'Not authorized', 401
+    pass
+
 
 @app.route('/songs', methods = ['POST', 'GET', 'OPTIONS'])
+@login_required()
 @crossdomain(origin='*')
 def library_list_all():
     if request.method == 'GET':
         if request_wants_json():
-            print lib.version
             md5 = hashlib.md5()
             md5.update('s36XLKU7095hu7asN' + str(lib.version))
             etag = 'W/"{0}"'.format(md5.hexdigest())
@@ -90,7 +110,7 @@ def library_list_all():
         decoded_metadata = json.loads(metadata)
         song_file = request.files['song_file']
         try:
-            song = lib.add(decoded_metadata['artist'], decoded_metadata['album'], decoded_metadata['song'])
+            song, album, artist = lib.add(decoded_metadata['artist'], decoded_metadata['album'], decoded_metadata['song'])
         except SongExists_Exception as e:
             return 'Song existed', 409
             pass
@@ -101,13 +121,31 @@ def library_list_all():
                              )
             song_file.save(disk_path)
             song['path'] = 'local'
+            if 'art' in artist and 'art' in album:
+                pass
+            else:
+                art, tag = musik.tagging.tag(disk_path)
+                if art is not None:
+                    art_data, art_ext = art
+                    art_path = lib.files.create(album.name + ':art',
+                                                prefix='art',
+                                                filename=album.key + art_ext
+                                                )
+                    album['art'] = 'local'
+                    with open(art_path, 'w+b') as fh:
+                        fh.write(art_data)
+                        pass
+                    pass
+                pass
             pass
         return json.dumps(song, cls=JSONEncoder), 201, {'Content-Type': 'application/json', 'Location': '/song/{0}'.format(song.key)}
         pass
     pass
 
+
 @app.route('/song/<key>', methods = ['GET', 'HEAD', 'OPTIONS'])
 @crossdomain(origin='*', headers = [ 'Content-Length', 'Range'])
+@login_required()
 def song_data(key):
     if request.method == 'HEAD':
         song = lib.songs[key]
@@ -126,9 +164,13 @@ def song_data(key):
     else:
         return "Format mismatch", 406
 
-@app.route('/')
-def index():
-    return musik.sendfile.sendfile('index.html')
+
+@app.route('/album/<key>/art')
+@login_required()
+def album_art(key):
+    album = lib.albums[key]
+    if album.art and os.path.exists(album.art):
+        return musik.sendfile.sendfile(album.art)
 
 if __name__ == "__main__":
     app.run(host="0.0.0.0", port=7681,  debug=False)
